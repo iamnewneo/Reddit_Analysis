@@ -20,7 +20,7 @@ import sqlite3 as sqlite
 
 # In[132]:
 
-conn = sqlite.connect('reddit_database.db')
+conn = sqlite.connect('philosophy_database.db')
 c = conn.cursor()
 
 
@@ -52,7 +52,7 @@ r = praw.Reddit(user_agent="Reddit Analysis Script")
 
 # In[137]:
 
-subreddit = r.get_subreddit('worldnews')
+subreddit = r.get_subreddit('philosophy')
 
 
 # In[138]:
