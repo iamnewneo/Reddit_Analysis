@@ -4,8 +4,8 @@
 # In[129]:
 
 import praw
-# import warnings
-# warnings.filterwarnings('ignore')
+import warnings
+warnings.filterwarnings('ignore')
 
 
 # In[130]:
