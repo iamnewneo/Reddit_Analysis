@@ -1,0 +1,8 @@
+subreddit:
+	post:
+	- post text
+	- post time
+	- post upvote
+	- all comments
+		- comment upvote
+		- comment time
