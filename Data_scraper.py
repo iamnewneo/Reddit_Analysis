@@ -4,9 +4,16 @@
 # In[129]:
 
 import praw
+# import warnings
+# warnings.filterwarnings('ignore')
 import warnings
-warnings.filterwarnings('ignore')
 
+def fxn():
+    warnings.warn("deprecated", DeprecationWarning)
+
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    fxn()
 
 # In[130]:
 
@@ -53,17 +60,22 @@ r = praw.Reddit(user_agent="Reddit Analysis Script")
 # In[137]:
 
 subreddit = r.get_subreddit('television')
-posts = subreddit.get_top(limit=1000)
+posts = subreddit.get_top_from_all(limit=1000)
 posts_ids = []
 for post in posts:
     posts_ids.append(post.id)
-# In[138]:  
+print("Toal number of posts")
+print(len(posts_ids))
+# In[138]:
 count = 0
 for posts_id in posts_ids:
-    subreddit_id = subreddit.id
-    submission = r.get_submission(submission_id=posts_id)
-    submission.replace_more_comments(limit=None, threshold=0)
-    comments = praw.helpers.flatten_tree(submission.comments)
+    try:
+        subreddit_id = subreddit.id
+        submission = r.get_submission(submission_id=posts_id)
+        submission.replace_more_comments(limit=None, threshold=0)
+        comments = praw.helpers.flatten_tree(submission.comments)
+    except:
+        print("Error fetching data for submission id: " + str(posts_id))
     try:
         submission_id = submission.id
     except:
@@ -88,10 +100,12 @@ for posts_id in posts_ids:
         submission_total_comments = submission.num_comments
     except:
         submission_total_comments = str(999999)
-    
-    c.execute("INSERT INTO subreddits VALUES (?, ?)", (subreddit_id, submission_id))
-    c.execute("INSERT INTO posts VALUES (?, ?, ?, ?, ?, ?)",
-              (submission_id, submission_title, submission_text, submission_created_at, submission_ups, submission_total_comments))
+    try:
+        c.execute("INSERT INTO subreddits VALUES (?, ?)", (subreddit_id, submission_id))
+        c.execute("INSERT INTO posts VALUES (?, ?, ?, ?, ?, ?)",
+                  (submission_id, submission_title, submission_text, submission_created_at, submission_ups, submission_total_comments))
+    except:
+        print("..................SQL ERROR...........")
     #print(submission_id, submission_text, submission_created_at, submission_ups, submission_total_comments)
     for comment in comments:
         try:
@@ -110,9 +124,11 @@ for posts_id in posts_ids:
             comment_ups = comment.ups
         except:
             comment_ups = str(999999)
-        
-        c.execute("INSERT INTO comments VALUES (?, ?, ?, ?,?)",
-                  (submission_id,comment_id, comment_body, comment_created_at, comment_ups))
+        try:
+            c.execute("INSERT INTO comments VALUES (?, ?, ?, ?,?)",
+                      (submission_id,comment_id, comment_body, comment_created_at, comment_ups))
+        except:
+            print("..................SQL ERROR...........")
         #print(submission_id,comment_id, comment_body, comment_created_at, comment_ups)
     count = count + 1
     conn.commit()
