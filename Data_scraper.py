@@ -54,14 +54,14 @@ r = praw.Reddit(user_agent="Reddit Analysis Script")
 
 subreddit = r.get_subreddit('television')
 posts = subreddit.get_top(limit=1000)
-
-# In[138]:
-print("<<<<<<<< -------- Total SUbmissoins on this thread ----- >>>>>")
-print(len(posts))
-count = 0
+posts_ids = []
 for post in posts:
+    posts_ids.append(post.id)
+# In[138]:  
+count = 0
+for posts_id in posts_ids:
     subreddit_id = subreddit.id
-    submission = r.get_submission(submission_id=post.id)
+    submission = r.get_submission(submission_id=posts_id)
     submission.replace_more_comments(limit=None, threshold=0)
     comments = praw.helpers.flatten_tree(submission.comments)
     try:
