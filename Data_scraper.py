@@ -20,7 +20,7 @@ import sqlite3 as sqlite
 
 # In[132]:
 
-conn = sqlite.connect('philosophy_database.db')
+conn = sqlite.connect('television_database.db')
 c = conn.cursor()
 
 
@@ -52,14 +52,17 @@ r = praw.Reddit(user_agent="Reddit Analysis Script")
 
 # In[137]:
 
-subreddit = r.get_subreddit('philosophy')
-
+subreddit = r.get_subreddit('television')
+posts = subreddit.get_top(limit=1000)
 
 # In[138]:
 
 count = 0
-for submission in subreddit.get_top(limit=1000):
+for post in posts:
     subreddit_id = subreddit.id
+    submission = r.get_submission(submission_id=post.id)
+    submission.replace_more_comments(limit=None, threshold=0)
+    comments = praw.helpers.flatten_tree(submission.comments)
     try:
         submission_id = submission.id
     except:
@@ -88,8 +91,6 @@ for submission in subreddit.get_top(limit=1000):
     c.execute("INSERT INTO subreddits VALUES (?, ?)", (subreddit_id, submission_id))
     c.execute("INSERT INTO posts VALUES (?, ?, ?, ?, ?, ?)",
               (submission_id, submission_title, submission_text, submission_created_at, submission_ups, submission_total_comments))
-    submission.replace_more_comments(limit=None, threshold=0)
-    comments = praw.helpers.flatten_tree(submission.comments)
     #print(submission_id, submission_text, submission_created_at, submission_ups, submission_total_comments)
     for comment in comments:
         try:
@@ -113,6 +114,7 @@ for submission in subreddit.get_top(limit=1000):
                   (submission_id,comment_id, comment_body, comment_created_at, comment_ups))
         #print(submission_id,comment_id, comment_body, comment_created_at, comment_ups)
     count = count + 1
+    conn.commit()
     print("Total " + str(count) + " submissions scraped.")
 
 
