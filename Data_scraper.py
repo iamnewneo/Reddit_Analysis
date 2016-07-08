@@ -56,7 +56,8 @@ subreddit = r.get_subreddit('television')
 posts = subreddit.get_top(limit=1000)
 
 # In[138]:
-
+print("<<<<<<<< -------- Total SUbmissoins on this thread ----- >>>>>")
+print(len(posts))
 count = 0
 for post in posts:
     subreddit_id = subreddit.id
